@@ -8,41 +8,63 @@ const R = parseInt(inputs[0]); // number of rows.
 const C = parseInt(inputs[1]); // number of columns.
 const A = parseInt(inputs[2]); // number of rounds between the time the alarm countdown is activated and the time the alarm goes off.
 
-var path = [];
+var path = []; //put directions in here, when arrived at the target, then recursivly check for the shortest route
 var scannedMaze = [];
+
+
+var maze = [];
+
+var wayBackMaze = [];
+//empty maze for way back
 for(let i = 0; i < R; i++){
-    scannedMaze.push([]);
-    for(let j = 0; j < C; j++){
-        scannedMaze[i].push("");
-    }
+   wayBackMaze.push([]);
+   for(let j = 0; j < C; j++){
+       wayBackMaze[i].push(false);
+   }
 }
 
-var startingPointR = undefined;
-var startingPointC = undefined;
 
 var reachedControllRoom = false;
 
+var walkedCoordinates = [];
+var shortenedPath = [];
+
+
 var currentDirection = 0;
 
-const directions = [
+const directions = [ //eigentlich 4 Elemente, start bei 0, aber spart code fuer wrapping (nicht elegant)
     "UP",
     "RIGHT",
     "DOWN",
-    "LEFT"
+    "LEFT",
+    "UP",
+    "RIGHT",
+    "DOWN",
+    "LEFT",
+    "UP",
+    "RIGHT",
+    "DOWN",
+    "LEFT",
 ]
 
-const directionIdentifier = [
-    [-1, 0], //one row up 
-    [0, -1], //one column up
-    [1, 0], //one row down
-    [0, 1] //one column down
+const directionIdentifier = [//eigentlich 4 Elemente, start bei 0, aber spart code fuer wrapping (nicht elegant)
+    [-1,0], //one row up 
+    [0,1], //one column up
+    [1,0], //one row down
+    [0,-1], //one column down
+    [-1,0], //one row up 
+    [0,1], //one column up
+    [1,0], //one row down
+    [0,-1], //one column down
+    [-1,0], //one row up 
+    [0,1], //one column up
+    [1,0], //one row down
+    [0,-1], //one column down
 ]
 
-const turn = 1;
 
-var rotation = 0;
+var direction = 4;
 
-var walkedPath = []; //put directions in here, when arrived at the target, then recursivly check for the shortest route
 
 // game loop
 while (true) {
@@ -50,72 +72,57 @@ while (true) {
     const KR = parseInt(inputs[0]); // row where Rick is located.
     const KC = parseInt(inputs[1]); // column where Rick is located.
 
-    //maybe useless depends on the alg to find the way back
-    if(!startingPointR){
-        startingPointR = KR;
-        startingPointC = KC;
-    }
+    walkedCoordinates.push([KR,KC]);
 
 
-
-
-    var maze = [];
+    maze = [];
     for (let i = 0; i < R; i++) {
         maze.push(readline()); // C of the characters in '#.TC?' (i.e. one line of the ASCII maze).
     }
 
-    //scan maze in 5x5 radius
-    for(let i = -2; i <= 2; i++){
-        for(let j = -2; j <= 2; j++){
-            const scanPosR = KR + i;
-            const scanPosC = KC + j;
-
-            if(IsOnMap(scanPosR,scanPosC)){
-                if(maze[scanPosR][scanPosC] = "") {
-                    scannedMaze[scanPosR][scanPosC] = maze[scanPosR][scanPosC];    
-                }
-            }   
-        }
-    }
-
-
-    //pledge alg
     
-    
-    //check if current pos is destination
-   
-
     if(reachedControllRoom){
-        //go best way back (que via recusion and revese)
-
-
+       WayBack()
+       
     } else {
-        if(scannedMaze[KR][KC] == "C"){
-            reachedControllRoom = true;
-            //recursion to find best way back
+        if(maze[KR][KC] == "C"){
+           reachedControllRoom = true;
+
+           for(let i = walkedCoordinates.length - 1; i >= 0; i--){
+               if(wayBackMaze[walkedCoordinates[i][0]][walkedCoordinates[i][1]]){
+                   const lastCross = wayBackMaze.indexOf(walkedCoordinates[i]);
+                   shortenedPath = shortenedPath.slice(0, lastCross);
+               } else {
+                   wayBackMaze[walkedCoordinates[i][0]][walkedCoordinates[i][1]] = true;
+                   shortenedPath.push(path[i]);
+               }
+           }
+
+           shortenedPath = shortenedPath.reverse();
+           if(!shortenedPath[shortenedPath.length -1]){shortenedPath.pop();};
+           WayBack()
 
         } else {
-
-
+           
             var preventAutoBehavior = false;
             //if possible: turn rigth (rotation += 1), else if possible: walk straigth(rotation += 0), else if possible turn left(rotation -= 1), else walk back(rotation += 2)  
-            if(direction == 4){
-                direction = 0;
-                preventAutoBehavior = true;
-            
-            } // add to prevent turn rigth...
-        
-            if(IsWalkPossible(KR+directionIdentifier[direction][0],KC+directionIdentifier[direction][1]) && !preventAutoBehavior){
+            if(direction == 8 || direction == 0){
+                direction = 4;
+                //preventAutoBehavior = true;
+            } 
+           
+
+            console.error(direction);
+            if(IsWalkPossible(KR+parseInt(directionIdentifier[direction - 1][0]),KC+parseInt(directionIdentifier[direction - 1][1])) && !preventAutoBehavior){
                 //turn rigth
-                
-                direction += 1;
-            } else if(IsWalkPossible(KR+directionIdentifier[direction + 1][0],KC+directionIdentifier[direction+1][1])){
+                direction -= 1;
+            } else if(IsWalkPossible(KR+directionIdentifier[direction][0],KC+directionIdentifier[direction][1])){
                 //go straigth
-        
-            } else if(IsWalkPossible(KR+directionIdentifier[direction + 2][0],KC+directionIdentifier[direction+2][1])){
+               
+            } else if(IsWalkPossible(KR+directionIdentifier[direction +1][0],KC+directionIdentifier[direction+1][1])){
                 //turn left
         
-                direction -= 1;
+                direction += 1;
             } else {
                 //go back
                 direction += 2;
@@ -131,9 +138,6 @@ while (true) {
 
         }
     }
-
-    
-
 }
 
 
@@ -150,8 +154,21 @@ function IsWalkPossible(localR, localC){
         return false;
     }
 
-    if(scannedMaze[localR][localC] == "#"){
+    if(maze[localR][localC] == "#" || maze[localR][localC] == "?"){
         return false;
     }
     return true;
+}
+
+function WayBack(){
+   var queue = shortenedPath.pop();
+   if(queue == "UP"){
+       console.log("DOWN");
+   } else if(queue == "DOWN"){
+       console.log("UP");
+   } else if(queue == "RIGHT"){
+       console.log("LEFT");
+   } else {
+       console.log("RIGHT");
+   }
 }
