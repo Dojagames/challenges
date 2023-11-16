@@ -69,13 +69,13 @@ while (true) {
             } 
         }
         if(tempIndex == maze.length){
-            console.error("done");
             finishedScanning = true;
             CreateWorkableMaze();
         }
     }
 
-    //check if queue is empty and if there are unexplored cells next to the current
+    //check if queue is empty and if there are unexplored cells next to the current 
+    //if controllroom is never the neighbor, then the test case fails (therefore case 8 fails)
     if(!queue.length && walkedWay.length > 0 && !visitedMaze[KR][KC].includes(true)){
         finishedScanning = true;
         CreateWorkableMaze();
@@ -198,7 +198,6 @@ function goBackUntilCrosswalk(){
     var goTo = queue.pop(); // get last step and delete from que
      
     //reverse last step
-    console.error(queue);
     if(goTo == "UP"){
         walkedWay.push("DOWN");
         console.log("DOWN");
@@ -295,17 +294,17 @@ function CreateWorkableMaze(){
 
 
 
-//Pathfinding whichery
-function Pathfinding(position, end) {
+//Pathfinding BFS
+function Pathfinding(start, goal) {
     var queue = [];
   
-    PathfindingMaze[position[0]][position[1]] = 1;
-    queue.push([position]); 
+    PathfindingMaze[start[0]][start[1]] = 1; //sets starting position to not walkable
+    queue.push([start]); //puts start pos to queue
   
     while (queue.length > 0) {
-      var path = queue.shift(); 
-      var pos = path[path.length-1];
-      var direction = [
+      var path = queue.shift(); //gets first element from que
+      var pos = path[path.length-1]; //gets last element from path -> current position 
+      var direction = [ // stores directions from current position
         [pos[0] + 1, pos[1]],
         [pos[0], pos[1] + 1],
         [pos[0] - 1, pos[1]],
@@ -313,18 +312,24 @@ function Pathfinding(position, end) {
       ];
   
       for (var i = 0; i < direction.length; i++) {
-        if (direction[i][0] == end[0] && direction[i][1] == end[1]) {
-          return path.concat([end]); 
+        
+        //checks if cells is goal 
+        if (direction[i][0] == goal[0] && direction[i][1] == goal[1]) {
+          return path.concat([goal]); // returns path + goal as last position
         }
         
-        if (direction[i][0] < 0 || direction[i][0] >= PathfindingMaze.length 
-            || direction[i][1] < 0 || direction[i][1] >= PathfindingMaze[0].length 
-            || PathfindingMaze[direction[i][0]][direction[i][1]] != 0) { 
+        //check if cell is walkable line 0-4 checks out of bounds, line 5 checks for wall
+        if (direction[i][0] < 0 || 
+            direction[i][0] >= PathfindingMaze.length || 
+            direction[i][1] < 0 || 
+            direction[i][1] >= PathfindingMaze[0].length || 
+            PathfindingMaze[direction[i][0]][direction[i][1]] != 0) { 
           continue;
         }
-  
-        PathfindingMaze[direction[i][0]][direction[i][1]] = 1;
-        queue.push(path.concat([direction[i]])); 
+        
+
+        PathfindingMaze[direction[i][0]][direction[i][1]] = 1; //sets current pos to not walkable 
+        queue.push(path.concat([direction[i]])); //add current pos to que
       }
     }
 }
