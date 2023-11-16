@@ -70,7 +70,6 @@ while (true) {
         }
         if(tempIndex == maze.length){
             finishedScanning = true;
-            CreateWorkableMaze();
         }
     }
 
@@ -78,7 +77,6 @@ while (true) {
     //if controllroom is never the neighbor, then the test case fails (therefore case 8 fails)
     if(!queue.length && walkedWay.length > 0 && !visitedMaze[KR][KC].includes(true)){
         finishedScanning = true;
-        CreateWorkableMaze();
     }
  
 
@@ -91,12 +89,14 @@ while (true) {
 
     //then check if the current cell is the controllroom
     if(maze[KR][KC] == "C"){
+        CreateWorkableMaze();
+
         wayHome = Pathfinding([KR,KC], startingPoint); 
         wayHome.shift(); //removes first element, to get the first move (first element is the current position)
         
         goBack = true;
+
         WayBack(KR,KC);
-       
         continue;
     } 
     
@@ -125,7 +125,7 @@ while (true) {
     
     var walkTo = visitedMaze[KR][KC].indexOf(true); // gets index of walkable neighbor (0 = up, 1 = rigth...)
     if(walkTo != -1){ // if val == -1 means that there is no walkable neighbor 
-        visitedMaze[KR][KC][walkTo] = false; // sets neighbor as not walkable from the current node
+        visitedMaze[KR][KC][walkTo] = false; // sets neighbor as not walkable from the current cell
         
         queue.push(directions[walkTo]); 
         walkedWay.push(directions[walkTo]); 
@@ -157,7 +157,7 @@ function IsOnMap(localR, localC){
  
 
 
-//check if a specific local is viabale to walk to
+//check if a specific cell is viabale to walk to
 function IsWalkPossible(localR, localC){
      
     if(!IsOnMap(localR,localC)){
@@ -181,7 +181,7 @@ function IsWalkPossible(localR, localC){
  
 
 
-//scanes every neigbor of a cell to check if its viable - returns array of booleans[up, rigth, down, left] 
+//scanes every neigbor of a cell to check if its viable to walk to - returns array of booleans[up, rigth, down, left] 
 function ScanNeigbors(localR, localC){
     return [
         IsWalkPossible(localR - 1, localC), //up
@@ -193,7 +193,7 @@ function ScanNeigbors(localR, localC){
  
 
 
-//goes back to the last crosswalk-cell to check a new node
+//goes back to the last crosswalk-cell to check a new path
 function goBackUntilCrosswalk(){
     var goTo = queue.pop(); // get last step and delete from que
      
@@ -214,29 +214,10 @@ function goBackUntilCrosswalk(){
 }
  
 
-
-//follows the path home
-function WayBack(localR, localC){
-    const temp = wayHome.shift(); //get current step and shifts remaining array
-    const _R = temp[0];
-    const _L = temp[1];
-
-    //translates position to Command
-    if(_R > localR){
-      console.log("DOWN");  
-    } else if(_R < localR){
-        console.log("UP"); 
-    } else if(_L > localC){
-        console.log("RIGHT"); 
-    } else {
-        console.log("LEFT"); 
-    }
-}
- 
  
 //walks back until the controllroom is a neighbor  
 function GoToC(localR, localC){
-    //checks if neighbor is controllroom
+    //checks if neighbor is controllroom, then go to that cell
     if(NeighborIsC(localR + 1, localC)){
         console.log("DOWN");
     } else if(NeighborIsC(localR - 1, localC)){
@@ -277,6 +258,25 @@ function InverseWalk(_input){
 } 
 
 
+//follows the path to the starting position
+function WayBack(localR, localC){
+    const temp = wayHome.shift(); //get current step and shifts remaining array
+    const _R = temp[0];
+    const _L = temp[1];
+
+    //translates position to move command
+    if(_R > localR){
+      console.log("DOWN");  
+    } else if(_R < localR){
+        console.log("UP"); 
+    } else if(_L > localC){
+        console.log("RIGHT"); 
+    } else {
+        console.log("LEFT"); 
+    }
+}
+ 
+
 // create Maze with 0s and 1s to use Pathfinding
 function CreateWorkableMaze(){
     for(let i = 0; i < R; i++){
@@ -294,7 +294,7 @@ function CreateWorkableMaze(){
 
 
 
-//Pathfinding BFS
+//Pathfinding Algorythm (BFS) to get shortes way between 2 points
 function Pathfinding(start, goal) {
     var queue = [];
   
@@ -319,6 +319,7 @@ function Pathfinding(start, goal) {
         }
         
         //check if cell is walkable line 0-4 checks out of bounds, line 5 checks for wall
+        //when the cell is not walkable, then the position get skipped 
         if (direction[i][0] < 0 || 
             direction[i][0] >= PathfindingMaze.length || 
             direction[i][1] < 0 || 
@@ -327,9 +328,9 @@ function Pathfinding(start, goal) {
           continue;
         }
         
-
+        
         PathfindingMaze[direction[i][0]][direction[i][1]] = 1; //sets current pos to not walkable 
-        queue.push(path.concat([direction[i]])); //add current pos to que
+        queue.push(path.concat([direction[i]])); //add currently checking pos to que 
       }
     }
 }
