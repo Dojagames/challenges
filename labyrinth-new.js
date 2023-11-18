@@ -20,7 +20,7 @@ for(let i = 0; i < R; i++){
 }
 
 
-var walkedWay = []; // stores moves to get to the controllroom
+
 
 var deadend = false; // boolean to check if you are in a deadend
 var queue = []; // stores way since last cross walk, reverse to get out of deadends
@@ -33,6 +33,7 @@ var goBack = false; //boolean to initialize way back to start
 
 
 var PathfindingMaze = []; //maze with 0 and 1s to use pathfinding
+var wayToC = []; // array of moves to get to the controllroom
 var wayHome = []; // array of moves to get back to the start
 
 const directions = [ //array to use index to get the corresponding move Command
@@ -49,7 +50,7 @@ while (true) {
     const KR = parseInt(inputs[0]); // row where Rick is located.
     const KC = parseInt(inputs[1]); // column where Rick is located.
  
-    if(!startingPoint) startingPoint = [KR, KC];
+   
     
  
  
@@ -60,26 +61,12 @@ while (true) {
  
 
 
-     //check if complete maze is scanned
-     if(!finishedScanning){ 
-        var tempIndex = 0;
-        for(let i = 0; i < maze.length; i++){
-            if(!maze[i].includes("?")){
-                tempIndex++;
-            } 
-        }
-        if(tempIndex == maze.length){
-            finishedScanning = true;
-        }
-    }
+   //check if complete maze is scanned
+   if(!finishedScanning){ 
+       CheckForFinishedScanning(KR,KC);
+   }
 
-    //check if queue is empty and if there are unexplored cells next to the current 
-    //if controllroom is never the neighbor, then the test case fails (therefore case 8 fails)
-    if(!queue.length && walkedWay.length > 0 && !visitedMaze[KR][KC].includes(true)){
-        finishedScanning = true;
-    }
- 
-
+   if(!startingPoint) startingPoint = [KR, KC];
 
     //at first check if the "goBack" flag is true, to walk back to the starting position
     if(goBack){
@@ -89,15 +76,14 @@ while (true) {
 
     //then check if the current cell is the controllroom
     if(maze[KR][KC] == "C"){
-        CreateWorkableMaze();
-
-        wayHome = Pathfinding([KR,KC], startingPoint); 
-        wayHome.shift(); //removes first element, to get the first move (first element is the current position)
+       CreateWorkableMaze();
+       wayHome = Pathfinding([KR,KC], startingPoint); 
+       wayHome.shift(); //removes first element, to get the first move (first element is the current position)
         
-        goBack = true;
-
-        WayBack(KR,KC);
-        continue;
+       goBack = true;
+       WayBack(KR,KC);
+       
+       continue;
     } 
     
     // then check if the complete maze is scanned or if no moves are legal -> then walk to the controllroom
@@ -128,7 +114,6 @@ while (true) {
         visitedMaze[KR][KC][walkTo] = false; // sets neighbor as not walkable from the current cell
         
         queue.push(directions[walkTo]); 
-        walkedWay.push(directions[walkTo]); 
         console.log(directions[walkTo]); // go to walkable direction
     } else {
         // no walkable direction... walk back until at a crosswalk
@@ -199,36 +184,68 @@ function goBackUntilCrosswalk(){
      
     //reverse last step
     if(goTo == "UP"){
-        walkedWay.push("DOWN");
         console.log("DOWN");
     } else if(goTo == "DOWN"){
-        walkedWay.push("UP");
         console.log("UP");
     } else if(goTo == "RIGHT"){
-        walkedWay.push("LEFT");
         console.log("LEFT");
     } else {
-        walkedWay.push("RIGHT");
         console.log("RIGHT");
     }
 }
  
 
+function CheckForFinishedScanning(KR,KC){
+   //check if complete maze is scanned
+   var tempIndex = 0;
+   for(let i = 0; i < maze.length; i++){
+       if(!maze[i].includes("?")){
+           tempIndex++;
+       } 
+   }
+
+   if(tempIndex == maze.length){
+       finishedScanning = true;
+   }
+   
+   //check if queue is empty and if there are unexplored cells next to the current 
+   if(!queue.length && !visitedMaze[KR][KC].includes(true) && startingPoint){
+       finishedScanning = true;
+   }
+    
+   var posC = [0,0];
+   if(finishedScanning){
+       for(let i = 0; i < R; i++){
+           for(let j = 0; j < C; j++){
+               if(maze[i][j] == "C"){
+                   posC = [i,j];
+               }
+           }
+       }
+       CreateWorkableMaze();
+       wayToC = Pathfinding([KR,KC], posC);
+       wayToC.shift();
+   }
+}
+
+
  
 //walks back until the controllroom is a neighbor  
 function GoToC(localR, localC){
-    //checks if neighbor is controllroom, then go to that cell
-    if(NeighborIsC(localR + 1, localC)){
-        console.log("DOWN");
-    } else if(NeighborIsC(localR - 1, localC)){
-        console.log("UP");
-    } else if(NeighborIsC(localR, localC + 1)){
-        console.log("RIGHT");
-    } else if(NeighborIsC(localR, localC - 1)){
-        console.log("LEFT");
-    } else { 
-        InverseWalk(walkedWay.pop()); //walks back by getting and removing the last element of the walked way
-    }
+   const temp = wayToC.shift(); //get current step and shifts remaining array
+   const _R = temp[0];
+   const _L = temp[1];
+
+   //translates position to move command
+   if(_R > localR){
+     console.log("DOWN");  
+   } else if(_R < localR){
+       console.log("UP"); 
+   } else if(_L > localC){
+       console.log("RIGHT"); 
+   } else {
+       console.log("LEFT"); 
+   }
 }
  
 
@@ -279,10 +296,11 @@ function WayBack(localR, localC){
 
 // create Maze with 0s and 1s to use Pathfinding
 function CreateWorkableMaze(){
+   PathfindingMaze = [];
     for(let i = 0; i < R; i++){
         PathfindingMaze.push([]);
         for(let j = 0; j < C; j++){
-            if(maze[i][j] == "#"){
+            if(maze[i][j] == "#" || maze[i][j] == "?"){
                 PathfindingMaze[i].push(1);
             } else {
                 PathfindingMaze[i].push(0);
