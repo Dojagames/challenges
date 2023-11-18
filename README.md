@@ -11,13 +11,12 @@ Dann lauf ich alle besuchbaren Nachbarn ab, bis ich in einer Sackgasse bin, dann
 Das ganze mach ich solange, bis entweder das ganze Labyrinth aufgedeckt ist oder alle Wege abgelaufen wurden.
 
 
-Von da aus laufe ich dann solange zurück bis einer der benachbarten Zellen der Kontrollraum ist.
+Wenn das ganze Labyrinth aufgedeckt ist nutze ich BFS um den kürzesten Weg zum Kontrollraum und dann zurück zum Start zu finden. 
 
-Vom Kontrollraum aus nutze ich einen Pathfinding Algorithmus um den schnellsten Weg zurück zum Start zu finden. 
 
 ### Was noch zu verbessern ist:
 Ich könnte von Anfang an BFS nutzen, da sich dadurch die benachbarten Zellen aufdecken, während ich das Labyrinth ablaufe.
 
-Test Case 8 konnte nicht gelöst werden, da der Kontrollraum zu keinem Zeitpunkt der Nachbar von einer abgelaufenen Zelle war -> 
+Warum habe ich das nicht gemacht? ich habe eine Art DFS benutzt um so weniger Treibstoff zu verbrauchen um garantieren zu koennen, dass der Treibstoff reicht.
 
-Die Lösung dazu wäre, BFS zu nutzen um zum Kontrollraum zu kommen.
+
