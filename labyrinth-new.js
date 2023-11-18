@@ -147,11 +147,7 @@ function IsWalkPossible(localR, localC){
      
     if(!IsOnMap(localR,localC)){ return false; }
  
-    if(maze[localR][localC] == "#"){ return false; }
- 
-    if(!finishedScanning && maze[localR][localC] == "C"){ // while exploring cells, the controllroom is counted as not viable
-       return false;
-    }
+    if(maze[localR][localC] == "#" || maze[localR][localC] == "C") { return false; }// while exploring cells, the controllroom is counted as not viable
  
     if(visitedMaze[localR][localC].length){ //if the cell was entered before, then it is not viable for the exploring
        return false;
@@ -184,8 +180,9 @@ function goBackUntilCrosswalk(){
 //check if complete maze is scanned -> initiate walk to controllroom
 function CheckForFinishedScanning(KR,KC){
   
-   var tempIndex = 0;
-   for(let i = 0; i < maze.length; i++){
+   // checks if there are no more "?" in the maze
+   var tempIndex = 0; 
+   for(let i = 0; i < maze.length; i++){ 
        if(!maze[i].includes("?")){
            tempIndex++;
        } 
@@ -200,7 +197,7 @@ function CheckForFinishedScanning(KR,KC){
        finishedScanning = true;
    }
     
-   var posC = [0,0];
+   var posC = [0,0]; //search for C in maze 
    if(finishedScanning){
        for(let i = 0; i < R; i++){
            for(let j = 0; j < C; j++){
@@ -209,9 +206,9 @@ function CheckForFinishedScanning(KR,KC){
                }
            }
        }
-       CreateWorkableMaze();
-       wayToC = Pathfinding([KR,KC], posC);
-       wayToC.shift();
+       CreateWorkableMaze(); 
+       wayToC = Pathfinding([KR,KC], posC); //sets path to the controllroom
+       wayToC.shift(); // removes first element (first element is current position)
    }
 }
 
