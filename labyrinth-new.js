@@ -50,16 +50,12 @@ while (true) {
     const KR = parseInt(inputs[0]); // row where Rick is located.
     const KC = parseInt(inputs[1]); // column where Rick is located.
  
-   
-    
- 
  
     maze = []; //clears maze to write updated version
     for (let i = 0; i < R; i++) {
         maze.push(readline()); // C of the characters in '#.TC?' (i.e. one line of the ASCII maze).
     }
  
-
 
    //check if complete maze is scanned
    if(!finishedScanning){ 
@@ -74,23 +70,26 @@ while (true) {
        continue;
     }
 
+
     //then check if the current cell is the controllroom
     if(maze[KR][KC] == "C"){
-       CreateWorkableMaze();
-       wayHome = Pathfinding([KR,KC], startingPoint); 
-       wayHome.shift(); //removes first element, to get the first move (first element is the current position)
+        CreateWorkableMaze();
+        wayHome = Pathfinding([KR,KC], startingPoint); 
+        wayHome.shift(); //removes first element, to get the first move (first element is the current position)
+         
+        goBackToStart = true;
+        WayBack(KR,KC, wayHome);
         
-       goBackToStart = true;
-       WayBack(KR,KC, wayHome);
-       
-       continue;
+        continue;
     } 
-    
+
+
     // then check if the complete maze is scanned or if no moves are legal -> then walk to the controllroom
     if(finishedScanning){
-       WayBack(KR,KC, wayToC);
-       continue;
+        WayBack(KR,KC, wayToC);
+        continue;
     }
+    
 
     // check if current Cell was walked before, if not, put walkable neighbors in array of booleans [up, rigth, down, left]
     if(!visitedMaze[KR][KC].length){
@@ -108,7 +107,7 @@ while (true) {
         continue;
     }
     
-    
+    // walk to next cell
     var walkTo = visitedMaze[KR][KC].indexOf(true); // gets index of walkable neighbor (0 = up, 1 = rigth...)
     if(walkTo != -1){ // if val == -1 means that there is no walkable neighbor 
         visitedMaze[KR][KC][walkTo] = false; // sets neighbor as not walkable from the current cell
@@ -126,11 +125,6 @@ while (true) {
 
 
 
-
-
-
-
-
 //check if location is in the boundry of the maze
 function IsOnMap(localR, localC){
     if(localR > 0 && localR < R && localC > 0 && localC < C ){
@@ -139,7 +133,6 @@ function IsOnMap(localR, localC){
  
     return false;
 }
- 
 
 
 //check if a specific cell is viabale to walk to
@@ -157,7 +150,6 @@ function IsWalkPossible(localR, localC){
 }
  
 
-
 //scanes every neigbor of a cell to check if its viable to walk to - returns array of booleans[up, rigth, down, left] 
 function ScanNeigbors(localR, localC){
     return [
@@ -168,7 +160,6 @@ function ScanNeigbors(localR, localC){
     ];
 }
  
-
 
 //goes back to the last crosswalk-cell to check a new path
 function goBackUntilCrosswalk(){
@@ -213,7 +204,6 @@ function CheckForFinishedScanning(KR,KC){
 }
 
 
- 
 
 //check if Cell is the Controllroom
 function NeighborIsC(localR, localC){
@@ -225,7 +215,6 @@ function NeighborIsC(localR, localC){
     return false;
 }
  
-
 
 //inverse input, to reverse last steps
 function InverseWalk(_input){
@@ -274,8 +263,6 @@ function CreateWorkableMaze(){
         }
     }
 }
-
-
 
 
 //Pathfinding Algorythm (BFS) to get shortes way between 2 points
