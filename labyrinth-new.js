@@ -27,7 +27,7 @@ var queue = []; // stores way since last cross walk, reverse to get out of deade
 
 
 var finishedScanning = false; //if maze is completly scanned or there are no more new moves to explore
-var goBack = false; //boolean to initialize way back to start 
+var goBackToStart = false; //boolean to initialize way back to start 
 
 
 
@@ -68,10 +68,10 @@ while (true) {
 
    if(!startingPoint) startingPoint = [KR, KC];
 
-    //at first check if the "goBack" flag is true, to walk back to the starting position
-    if(goBack){
-        WayBack(KR,KC);
-        continue;
+    //at first check if the "goBackToStart" flag is true, to walk back to the starting position
+    if(goBackToStart){
+       WayBack(KR,KC, wayHome);
+       continue;
     }
 
     //then check if the current cell is the controllroom
@@ -80,16 +80,16 @@ while (true) {
        wayHome = Pathfinding([KR,KC], startingPoint); 
        wayHome.shift(); //removes first element, to get the first move (first element is the current position)
         
-       goBack = true;
-       WayBack(KR,KC);
+       goBackToStart = true;
+       WayBack(KR,KC, wayHome);
        
        continue;
     } 
     
     // then check if the complete maze is scanned or if no moves are legal -> then walk to the controllroom
     if(finishedScanning){
-        GoToC(KR,KC);
-        continue;
+       WayBack(KR,KC, wayToC);
+       continue;
     }
 
     // check if current Cell was walked before, if not, put walkable neighbors in array of booleans [up, rigth, down, left]
@@ -145,20 +145,16 @@ function IsOnMap(localR, localC){
 //check if a specific cell is viabale to walk to
 function IsWalkPossible(localR, localC){
      
-    if(!IsOnMap(localR,localC)){
-        return false;
-    }
+    if(!IsOnMap(localR,localC)){ return false; }
  
-    if(maze[localR][localC] == "#"){
-        return false;
-    }
+    if(maze[localR][localC] == "#"){ return false; }
  
     if(!finishedScanning && maze[localR][localC] == "C"){ // while exploring cells, the controllroom is counted as not viable
-        return false;
+       return false;
     }
  
     if(visitedMaze[localR][localC].length){ //if the cell was entered before, then it is not viable for the exploring
-        return false;
+       return false;
     }
  
     return true;
@@ -180,23 +176,14 @@ function ScanNeigbors(localR, localC){
 
 //goes back to the last crosswalk-cell to check a new path
 function goBackUntilCrosswalk(){
-    var goTo = queue.pop(); // get last step and delete from que
-     
-    //reverse last step
-    if(goTo == "UP"){
-        console.log("DOWN");
-    } else if(goTo == "DOWN"){
-        console.log("UP");
-    } else if(goTo == "RIGHT"){
-        console.log("LEFT");
-    } else {
-        console.log("RIGHT");
-    }
+   var goTo = queue.pop(); // get last step and delete from que
+   InverseWalk(goTo);
 }
  
 
+//check if complete maze is scanned -> initiate walk to controllroom
 function CheckForFinishedScanning(KR,KC){
-   //check if complete maze is scanned
+  
    var tempIndex = 0;
    for(let i = 0; i < maze.length; i++){
        if(!maze[i].includes("?")){
@@ -230,24 +217,6 @@ function CheckForFinishedScanning(KR,KC){
 
 
  
-//walks back until the controllroom is a neighbor  
-function GoToC(localR, localC){
-   const temp = wayToC.shift(); //get current step and shifts remaining array
-   const _R = temp[0];
-   const _L = temp[1];
-
-   //translates position to move command
-   if(_R > localR){
-     console.log("DOWN");  
-   } else if(_R < localR){
-       console.log("UP"); 
-   } else if(_L > localC){
-       console.log("RIGHT"); 
-   } else {
-       console.log("LEFT"); 
-   }
-}
- 
 
 //check if Cell is the Controllroom
 function NeighborIsC(localR, localC){
@@ -275,9 +244,9 @@ function InverseWalk(_input){
 } 
 
 
-//follows the path to the starting position
-function WayBack(localR, localC){
-    const temp = wayHome.shift(); //get current step and shifts remaining array
+//follows the path to the starting position or controllroom
+function WayBack(localR, localC, _array){
+    const temp = _array.shift(); //get current step and shifts remaining array
     const _R = temp[0];
     const _L = temp[1];
 
