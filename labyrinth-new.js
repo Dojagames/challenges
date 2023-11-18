@@ -1,8 +1,3 @@
-/**
- * Auto-generated code below aims at helping you parse
- * the standard input according to the problem statement.
- **/
-
 var inputs = readline().split(' ');
 const R = parseInt(inputs[0]); // number of rows.
 const C = parseInt(inputs[1]); // number of columns.
@@ -11,15 +6,13 @@ const A = parseInt(inputs[2]); // number of rounds between the time the alarm co
 var startingPoint = undefined; // [row,col]
 var maze;
 
-var visitedMaze = []; // maze to store walkable neighbors
+var visitedMaze = []; // maze to store walkable neighbors for dfs
 for(let i = 0; i < R; i++){
     visitedMaze.push([]);
     for(let j = 0; j < C; j++){
         visitedMaze[i].push([]);
     }
 }
-
-
 
 
 var deadend = false; // boolean to check if you are in a deadend
@@ -30,11 +23,10 @@ var finishedScanning = false; //if maze is completly scanned or there are no mor
 var goBackToStart = false; //boolean to initialize way back to start 
 
 
-
-
 var PathfindingMaze = []; //maze with 0 and 1s to use pathfinding
 var wayToC = []; // array of moves to get to the controllroom
 var wayHome = []; // array of moves to get back to the start
+
 
 const directions = [ //array to use index to get the corresponding move Command
     "UP",
