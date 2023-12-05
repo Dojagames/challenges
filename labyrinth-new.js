@@ -195,17 +195,6 @@ function CheckForFinishedScanning(KR,KC){
    }
 }
 
-
-
-//check if Cell is the Controllroom
-function NeighborIsC(localR, localC){
-    if(IsOnMap(localR,localC)){
-        if(maze[localR][localC] == "C"){
-            return true
-        }
-    }
-    return false;
-}
  
 
 //inverse input, to reverse last steps
