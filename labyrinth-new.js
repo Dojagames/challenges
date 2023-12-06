@@ -236,11 +236,8 @@ function CreateWorkableMaze(){
     for(let i = 0; i < R; i++){
         PathfindingMaze.push([]);
         for(let j = 0; j < C; j++){
-            if(maze[i][j] == "#" || maze[i][j] == "?"){
-                PathfindingMaze[i].push(1);
-            } else {
-                PathfindingMaze[i].push(0);
-            }
+            PathfindingMaze[i].push(maze[i][j]);
+            
         }
     }
 }
@@ -273,12 +270,13 @@ function Pathfinding(start, goal) {
         //check if cell is walkable line 0-4 checks out of bounds, line 5 checks for wall
         //when the cell is not walkable, then the position get skipped 
         if (!IsOnMap(direction[i][0],direction[i][1]) || 
-            PathfindingMaze[direction[i][0]][direction[i][1]] != 0) { 
+            PathfindingMaze[direction[i][0]][direction[i][1]] == "#" || 
+            PathfindingMaze[direction[i][0]][direction[i][1]] == "?" ) { 
           continue;
         }
         
         
-        PathfindingMaze[direction[i][0]][direction[i][1]] = 1; //sets current pos to not walkable 
+        PathfindingMaze[direction[i][0]][direction[i][1]] = "#"; //sets current pos to not walkable 
         queue.push(path.concat([direction[i]])); //add currently checking pos to que 
       }
     }
