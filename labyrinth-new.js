@@ -272,10 +272,7 @@ function Pathfinding(start, goal) {
         
         //check if cell is walkable line 0-4 checks out of bounds, line 5 checks for wall
         //when the cell is not walkable, then the position get skipped 
-        if (direction[i][0] < 0 || 
-            direction[i][0] >= PathfindingMaze.length || 
-            direction[i][1] < 0 || 
-            direction[i][1] >= PathfindingMaze[0].length || 
+        if (!IsOnMap(direction[i][0],direction[i][1]) || 
             PathfindingMaze[direction[i][0]][direction[i][1]] != 0) { 
           continue;
         }
