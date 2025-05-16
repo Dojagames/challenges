@@ -1,22 +1,25 @@
-# CodinGame Labyrinth
+# 🧩 challenges
 
-## Gedanken dazu:
+Ein kleines Projekt aus dem Bewerbungskontext.  
+Anfangs halbherzig runtergehackt, weil ich dachte: „Wird schon reichen.“  
+Spoiler: Hat's nicht. War Müll.
 
-Da ich mit dem letzten Code nicht den kürzesten Weg garantieren konnte, war mein erster Ansatz, dass ich als erstes das ganze Labyrinth ablaufe, um so danach garantiert den kürzesten Weg finde. 
+Dann reflektiert, neu angesetzt, und es einfach mal *vernünftig* durchgezogen –  
+an einem Nachmittag, mit deutlich mehr Sorgfalt, Struktur und Hirn.  
+Am Ende war das Ergebnis... naja, sagen wir:  
+**Besser als das, was mein dann Arbeitgeber abgeliefert hat. :)**
 
-Dafür habe ich mir überlegt, dass ich bei jeder besuchten Zelle ein Array anlege um so die Nachbarzellen zu speichern, welche betretbar sind und noch nicht besucht wurden. 
+## 🎯 Inhalt
 
-Dann lauf ich alle besuchbaren Nachbarn ab, bis ich in einer Sackgasse bin, dann lauf ich zurück um diesen Schritt von der nächsten Zelle zu wiederholen. (eine Art DFS)
+- Verschiedene kleinere Challenges mit Fokus auf Problemlösen, Logik, Codequalität  
+- Alles modular aufgebaut, keine Quick'n'Dirty-Lösungen  
+- Mit dem Ziel, nicht einfach nur „irgendwie“ zu funktionieren,  
+  sondern lesbar, testbar und wartbar zu sein
 
-Das ganze mach ich solange, bis entweder das ganze Labyrinth aufgedeckt ist oder alle Wege abgelaufen wurden.
+## 🧠 Warum das hier existiert
 
+Weil ich gemerkt hab, dass ich Bock drauf hab, wenn ich's *richtig* angehe.  
+Und weil man sich manchmal erst blamieren muss,  
+um den eigenen Standard wiederzufinden.
 
-Wenn das ganze Labyrinth aufgedeckt ist nutze ich BFS um den kürzesten Weg zum Kontrollraum und dann zurück zum Start zu finden. 
-
-
-### Was noch zu verbessern ist:
-Ich könnte von Anfang an BFS nutzen, da sich dadurch die benachbarten Zellen aufdecken, während ich das Labyrinth ablaufe.
-
-Warum habe ich das nicht gemacht? ich habe eine Art DFS benutzt um so weniger Treibstoff zu verbrauchen um garantieren zu koennen, dass der Treibstoff reicht.
-
-
+---
